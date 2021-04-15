@@ -65,6 +65,7 @@ func LogFn(ctx context.Context, functionName string, args *map[string]interface{
 		logger := Get(ctx).WithFields(logrus.Fields{
 			"fnExit": 1,
 			"fnName": functionName,
+      "experiment": true,
 		})
 
 		log(ctx, logger, forceLog(forceLogs...), logrus.InfoLevel, nil)
