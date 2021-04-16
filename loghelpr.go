@@ -2,7 +2,6 @@ package loghelpr
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/rakamoviz/loghelpr/contextkeys"
 	"github.com/sirupsen/logrus"
@@ -37,8 +36,6 @@ func Get(ctx context.Context) *logrus.Entry {
 
 func Fn(ctx context.Context, functionName string, args *map[string]interface{}, forceLogs ...bool) func() {
 	forceLog := forceLog(forceLogs...)
-
-	fmt.Println(forceLog)
 
 	logger := Get(ctx).WithFields(logrus.Fields{
 		"fnEntrance": 1,
