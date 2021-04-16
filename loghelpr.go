@@ -18,6 +18,7 @@ package loghelpr
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/rakamoviz/loghelpr/contextkeys"
 	"github.com/sirupsen/logrus"
@@ -60,30 +61,26 @@ func Get(ctx context.Context) *logrus.Entry {
 	return logger.(*logrus.Entry)
 }
 
-func LogFn(ctx context.Context, functionName string, args *map[string]interface{}) func(...bool) string {
-	return func(forceLogs ...bool) string {
+func Fn(ctx context.Context, functionName string, args *map[string]interface{}, forceLogs ...bool) func() {
+	forceLog := forceLog(forceLogs...)
+
+	fmt.Println(forceLog)
+
+	logger := Get(ctx).WithFields(logrus.Fields{
+		"fnEntrance": 1,
+		"fnName":     functionName,
+		"fnArgs":     args,
+	})
+
+	log(ctx, logger, forceLog, logrus.InfoLevel, nil)
+
+	return func() {
 		logger := Get(ctx).WithFields(logrus.Fields{
 			"fnExit": 1,
 			"fnName": functionName,
 		})
 
-		log(ctx, logger, forceLog(forceLogs...), logrus.InfoLevel, nil)
-
-		return functionName
-	}
-}
-
-func Fn(ctx context.Context, functionName string, args *map[string]interface{}) func(...bool) (context.Context, string, *map[string]interface{}) {
-	return func(forceLogs ...bool) (context.Context, string, *map[string]interface{}) {
-		logger := Get(ctx).WithFields(logrus.Fields{
-			"fnEntrance": 1,
-			"fnName":     functionName,
-			"fnArgs":     args,
-		})
-
-		log(ctx, logger, forceLog(forceLogs...), logrus.InfoLevel, nil)
-
-		return ctx, functionName, args
+		log(ctx, logger, forceLog, logrus.InfoLevel, nil)
 	}
 }
 
